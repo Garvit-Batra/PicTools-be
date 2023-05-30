@@ -31,6 +31,8 @@ PROTOTXT = "./model/colorization_deploy_v2.prototxt.txt"
 POINTS = "./model/pts_in_hull.npy"
 MODEL = combined_model
 
+print("Starting")
+
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", type=str, required=True,
                 help="path to input black and white image")
@@ -41,6 +43,7 @@ args = vars(ap.parse_args())
 net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
 pts = np.load(POINTS)
 
+print("Manipulating layers")
 class8 = net.getLayerId("class8_ab")
 conv8 = net.getLayerId("conv8_313_rh")
 pts = pts.transpose().reshape(2, 313, 1, 1)
@@ -55,6 +58,7 @@ resized = cv2.resize(lab, (224, 224))
 L = cv2.split(resized)[0]
 L -= 50
 
+print("Filling")
 net.setInput(cv2.dnn.blobFromImage(L))
 ab = net.forward()[0, :, :, :].transpose((1, 2, 0))
 
@@ -67,5 +71,5 @@ colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
 colorized = np.clip(colorized, 0, 1)
 colorized = (255 * colorized).astype("uint8")
 
+print("Ending")
 cv2.imwrite('./public/colored/' + args["string_arg"]+'.jpg', colorized)
-cv2.waitKey(0)
