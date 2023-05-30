@@ -11,12 +11,14 @@
 import numpy as np
 import argparse
 import cv2
+import tempfile
+import os
 
 print("Starting")
 model_part1 = "./model/colorization_release_v2_part1.caffemodel"
 model_part2 = "./model/colorization_release_v2_part2.caffemodel"
 model_part3 = "./model/colorization_release_v2_part3.caffemodel"
-combined_model = "./model/colorization_release_v2_combined.caffemodel"
+# combined_model = "./model/colorization_release_v2_combined.caffemodel"
 
 combined_data = b""
 with open(model_part1, 'rb') as f:
@@ -26,13 +28,15 @@ with open(model_part2, 'rb') as f:
 with open(model_part3, 'rb') as f:
     combined_data += f.read()
 
-with open(combined_model, 'wb') as f:
-    f.write(combined_data)
+# with open(combined_model, 'wb') as f:
+#     f.write(combined_data)
 
 PROTOTXT = "./model/colorization_deploy_v2.prototxt.txt"
 POINTS = "./model/pts_in_hull.npy"
-MODEL = combined_model
-
+# MODEL = combined_model
+temp_file = tempfile.NamedTemporaryFile(delete=False)
+temp_file.write(combined_data)
+temp_file.close()
 print("Starting")
 
 ap = argparse.ArgumentParser()
@@ -42,8 +46,10 @@ ap.add_argument("-s", "--string_arg", type=str, required=False,
                 help="your string argument")
 args = vars(ap.parse_args())
 
-net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
+net = cv2.dnn.readNetFromCaffe(PROTOTXT, temp_file.name)
 pts = np.load(POINTS)
+
+os.remove(temp_file.name)
 
 print("Manipulating layers")
 class8 = net.getLayerId("class8_ab")
