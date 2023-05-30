@@ -11,19 +11,21 @@
 import numpy as np
 import argparse
 import cv2
+
 print("Starting")
 model_part1 = "./model/colorization_release_v2_part1.caffemodel"
 model_part2 = "./model/colorization_release_v2_part2.caffemodel"
 model_part3 = "./model/colorization_release_v2_part3.caffemodel"
 combined_model = "./model/colorization_release_v2_combined.caffemodel"
 
+combined_data = b""
 with open(model_part1, 'rb') as f:
-    data_part1 = f.read()
+    combined_data += f.read()
 with open(model_part2, 'rb') as f:
-    data_part2 = f.read()
+    combined_data += f.read()
 with open(model_part3, 'rb') as f:
-    data_part3 = f.read()
-combined_data = data_part1 + data_part2 + data_part3
+    combined_data += f.read()
+
 with open(combined_model, 'wb') as f:
     f.write(combined_data)
 
@@ -55,8 +57,7 @@ scaled = image.astype("float32") / 255.0
 lab = cv2.cvtColor(scaled, cv2.COLOR_BGR2LAB)
 
 resized = cv2.resize(lab, (224, 224))
-L = cv2.split(resized)[0]
-L -= 50
+L = resized[:, :, 0] - 50
 
 print("Filling")
 net.setInput(cv2.dnn.blobFromImage(L))
@@ -73,3 +74,6 @@ colorized = (255 * colorized).astype("uint8")
 
 print("Ending")
 cv2.imwrite('./public/colored/' + args["string_arg"]+'.jpg', colorized)
+
+print("Cleanup")
+net = None
