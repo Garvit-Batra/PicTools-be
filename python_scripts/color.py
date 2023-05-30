@@ -11,7 +11,7 @@
 import numpy as np
 import argparse
 import cv2
-
+print("Starting")
 model_part1 = "./model/colorization_release_v2_part1.caffemodel"
 model_part2 = "./model/colorization_release_v2_part2.caffemodel"
 model_part3 = "./model/colorization_release_v2_part3.caffemodel"
