@@ -1,5 +1,6 @@
 import cv2
 import argparse
+import os
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", type=str, required=True,
@@ -18,3 +19,7 @@ desired_height = args["integer_arg2"]
 resized_image = cv2.resize(image, (desired_width, desired_height))
 
 cv2.imwrite('./public/resize/' + args["string_arg"]+'.jpg', resized_image)
+if os.path.exists('./public/resize/' + args["string_arg"]+'.jpg'):
+    print("The file exists.")
+else:
+    print("The file does not exist.")
