@@ -144,7 +144,7 @@ app.post("/resize", upload.single("file"), async (req, res) => {
     res.sendFile(__dirname + `/public/resize/${req.file.filename}.jpg`);
     setTimeout(() => {
       fs.unlinkSync(`./public/resize/${req.file.filename}.jpg`);
-    }, 1000);
+    }, 10000);
   });
 });
 
